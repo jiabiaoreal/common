@@ -240,7 +240,7 @@ func (d *Duration) UnmarshalYAML(unmarshal func(interface{}) error) error {
 // MarshalJSON implements json.Marsharler interface
 func (d Duration) MarshalJSON() ([]byte, error) {
 	glog.V(10).Info(d.String())
-	return []byte(`"` + d.String() + `"`), nil
+	return []byte(d.String()), nil
 }
 
 // UnmarshalJSON implements json.Unmarshaler interface
