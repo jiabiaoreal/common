@@ -1,4 +1,4 @@
-package types
+package etcd
 
 import (
 	"bytes"
@@ -11,8 +11,8 @@ import (
 	"github.com/coreos/etcd/clientv3"
 	"github.com/coreos/etcd/pkg/tlsutil"
 	"github.com/golang/glog"
-	"we.com/jiabiao/common/encode"
 	mytime "we.com/jiabiao/common/time"
+	"we.com/jiabiao/common/yaml"
 )
 
 // EtcdConfig  read etcdconfig
@@ -58,7 +58,7 @@ func NewEtcdConfig(filename string) (clientv3.Config, error) {
 
 	yc := etcdConfig{}
 
-	decoder := encode.NewYAMLOrJSONDecoder(reader, 4)
+	decoder := yaml.NewYAMLOrJSONDecoder(reader, 4)
 	err = decoder.Decode(&yc)
 	if err != nil {
 		err := fmt.Errorf("error parse etcd config: %v", err)
