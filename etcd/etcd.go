@@ -15,6 +15,9 @@ import (
 	"we.com/jiabiao/common/yaml"
 )
 
+// Config is a clientv3.Config
+type Config clientv3.Config
+
 // EtcdConfig  read etcdconfig
 type etcdConfig struct {
 	// Endpoints is a list of URLs.
@@ -45,13 +48,13 @@ type etcdConfig struct {
 }
 
 // NewEtcdConfig get etcd config from this config
-func NewEtcdConfig(filename string) (clientv3.Config, error) {
+func NewEtcdConfig(filename string) (Config, error) {
 	ret := clientv3.Config{}
 	content, err := ioutil.ReadFile(filename)
 	if err != nil {
 		err := fmt.Errorf("error read etcd config file: %v", err)
 		glog.Error(err.Error())
-		return ret, err
+		return Config(ret), err
 	}
 
 	reader := bytes.NewReader(content)
@@ -63,7 +66,7 @@ func NewEtcdConfig(filename string) (clientv3.Config, error) {
 	if err != nil {
 		err := fmt.Errorf("error parse etcd config: %v", err)
 		glog.Error(err.Error())
-		return ret, err
+		return Config(ret), err
 	}
 
 	glog.V(4).Infof("get etcd config %v", ret)
@@ -78,7 +81,7 @@ func NewEtcdConfig(filename string) (clientv3.Config, error) {
 	}
 
 	if yc.InsecureTransport == nil || *yc.InsecureTransport {
-		return new, nil
+		return Config(new), nil
 	}
 
 	var (
@@ -89,14 +92,14 @@ func NewEtcdConfig(filename string) (clientv3.Config, error) {
 	if yc.Certfile != "" && yc.Keyfile != "" {
 		cert, err = tlsutil.NewCert(yc.Certfile, yc.Keyfile, nil)
 		if err != nil {
-			return ret, err
+			return Config(ret), err
 		}
 	}
 
 	if yc.CAfile != "" {
 		cp, err = tlsutil.NewCertPool([]string{yc.CAfile})
 		if err != nil {
-			return ret, err
+			return Config(ret), err
 		}
 	}
 
@@ -110,5 +113,5 @@ func NewEtcdConfig(filename string) (clientv3.Config, error) {
 	}
 	new.TLS = tlscfg
 
-	return new, nil
+	return Config(new), nil
 }
