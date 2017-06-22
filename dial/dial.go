@@ -272,11 +272,7 @@ func chkSize(response, size string) bool {
 	sizes := strings.Split(size, ",")
 	sizemin, _ := strconv.Atoi(sizes[0])
 	sizemax, _ := strconv.Atoi(sizes[1])
-	if len(response) < sizemin {
-
-	} else if len(response) > sizemax {
-
-	} else {
+	if len(response) > sizemin && len(response) < sizemax {
 		f = true
 	}
 	return f
