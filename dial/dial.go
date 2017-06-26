@@ -238,8 +238,10 @@ func check(code int, response string, checkmethod map[string]string) bool {
 			s = chkContains(response, v)
 		case "Md5":
 			s, _ = chkMd5(response, v)
-		case "Size":
-			s = chkSize(response, v)
+		case "Sizege":
+			s = chkSize(response, v, "ge")
+		case "Sizele":
+			s = chkSize(response, v, "le")
 		case "StatusCode":
 			dcode, err := strconv.Atoi(v)
 			if err == nil {
@@ -267,13 +269,23 @@ func chkMd5(response, md5sum string) (bool, error) {
 	return false, nil
 }
 
-func chkSize(response, size string) bool {
+func chkSize(response, size, j string) bool {
 	f := false
-	sizes := strings.Split(size, ",")
-	sizemin, _ := strconv.Atoi(sizes[0])
-	sizemax, _ := strconv.Atoi(sizes[1])
-	if len(response) > sizemin && len(response) < sizemax {
-		f = true
+	reby, err := strconv.Atoi(size)
+	if err != nil {
+		return f
+	}
+	switch j {
+	case "ge":
+		if len(response) > reby {
+			f = true
+		}
+	case "le":
+		if len(response) < reby {
+			f = true
+		}
+	default:
+		f = false
 	}
 	return f
 }
