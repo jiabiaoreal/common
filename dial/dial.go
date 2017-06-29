@@ -159,7 +159,6 @@ func Dial(dreq *Drequest, options ...Option) (res *Dresponse, err error) {
 
 // client: 对java服务不需要， 对php可能需要先认证
 func request(client *http.Client, method, url string, header map[string]string, body io.Reader) (*Dresponse, error) {
-	//requestT := Elapsed{}
 	res := &Dresponse{}
 	var tracetime struct {
 		connstart    time.Time
