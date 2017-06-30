@@ -142,18 +142,19 @@ func Dial(dreq *Drequest, options ...Option) (res *Dresponse, err error) {
 	  if _, err := io.Copy(os.Stdout, lr); err != nil {
 	      log.Fatal(err)
 	  }*/
+	lr := io.LimitReader(res.Response.Body, 1024*1024*10)
 	var out []byte
-	out, err = ioutil.ReadAll(res.Response.Body)
+	out, err = ioutil.ReadAll(lr)
+	res.Result = string(out)
 
-	var result string
-	if len(out) > 1024*1024 {
-		result = string(out[:1024*1024])
+	//var result string
+	if len(out) >= 1024*1024*10-1 {
+		//	result = string(out[:1024*1024*10])
+		res.Status = false
 	} else {
-		result = string(out)
+		//result = string(out)
+		res.Status = statuschk(res.Response.StatusCode, dreq.DailType, string(out), reopt)
 	}
-
-	res.Result = result
-	res.Status = statuschk(res.Response.StatusCode, dreq.DailType, string(out), reopt)
 	return
 }
 
@@ -246,11 +247,17 @@ func statuschk(code int, dailtype, response string, op *Op) bool {
 
 	if op.code != 0 {
 		f = chkCode(code, op.code)
+		if f == false {
+			return f
+		}
 		flag = false
 	}
 
 	if op.contain != "" {
 		f = chkContains(response, op.contain)
+		if f == false {
+			return f
+		}
 		flag = false
 	}
 
@@ -258,8 +265,7 @@ func statuschk(code int, dailtype, response string, op *Op) bool {
 		f = chkInclude(response, op.excludeItem)
 		if f {
 			f = false
-		} else {
-			f = true
+			return f
 		}
 		flag = false
 	}
@@ -267,20 +273,32 @@ func statuschk(code int, dailtype, response string, op *Op) bool {
 	if op.includeItem != "" {
 		f = chkInclude(response, op.includeItem)
 		flag = false
+		if f == false {
+			return f
+		}
 	}
 
 	if op.responsemd5 != "" {
 		f, _ = chkMd5(response, op.responsemd5)
 		flag = false
+		if f == false {
+			return f
+		}
 	}
 
 	if op.responsemin != 0 {
 		f = chkSize(response, op.responsemin, "ge")
+		if f == false {
+			return f
+		}
 		flag = false
 	}
 
 	if op.responsemax != 0 {
 		f = chkSize(response, op.responsemax, "le")
+		if f == false {
+			return f
+		}
 		flag = false
 	}
 
