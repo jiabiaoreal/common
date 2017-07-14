@@ -41,6 +41,15 @@ func ToJSON(data []byte) ([]byte, error) {
 	return yaml.YAMLToJSON(data)
 }
 
+// ToYAML converts a json string into a ymal format
+func ToYAML(data []byte) ([]byte, error) {
+	if !hasJSONPrefix(data) {
+		return data, nil
+	}
+
+	return yaml.JSONToYAML(data)
+}
+
 // YAMLToJSONDecoder decodes YAML documents from an io.Reader by
 // separating individual documents. It first converts the YAML
 // body to JSON, then unmarshals the JSON.
