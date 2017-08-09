@@ -82,7 +82,7 @@ func SetTransportDefaults(t *http.Transport) *http.Transport {
 		glog.Infof("HTTP2 has been explicitly disabled")
 	} else {
 		if err := http2.ConfigureTransport(t); err != nil {
-			glog.Warningingf("Transport failed http2 configuration: %v", err)
+			glog.Warningf("Transport failed http2 configuration: %v", err)
 		}
 	}
 	return t
